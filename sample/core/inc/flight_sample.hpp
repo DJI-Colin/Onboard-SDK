@@ -125,6 +125,18 @@ class FlightSample {
                             float yawDesiredInDeg,
                             float posThresholdInM = 0.5,
                             float yawThresholdInDeg = 1.0);
+  bool moveByPositionOffsetUsingBroadcastHeight(const Vector3f& offsetDesired,
+                                                float yawDesiredInDeg,
+                                                float posThresholdInM = 0.5,
+                                                float yawThresholdInDeg = 1.0);
+  bool moveByPositionOffsetUsingBroadcastAltitute(const Vector3f& offsetDesired,
+                                                  float yawDesiredInDeg,
+                                                  float posThresholdInM = 0.5,
+                                                  float yawThresholdInDeg = 1.0);
+  bool moveByPositionOffsetUsingSubscribeHeight(const Vector3f& offsetDesired,
+                                                float yawDesiredInDeg,
+                                                float posThresholdInM = 0.5,
+                                                float yawThresholdInDeg = 1.0);
 
  private:
   Vehicle *vehicle;
@@ -134,6 +146,8 @@ class FlightSample {
   static Vector3f vector3FSub(const Vector3f &vectorA, const Vector3f &vectorB);
   static Vector3f localOffsetFromGpsOffset(const Telemetry::GPSFused &target,
                                            const Telemetry::GPSFused &origin);
+  static Vector3f localOffsetFromGpsAndHeightOffset(const Telemetry::GPSFused& target, const Telemetry::GPSFused& origin,
+                                                    const float32_t& targetHeight, const float32_t& originHeight);
   static Vector3f quaternionToEulerAngle(const Telemetry::Quaternion &quat);
   static void  horizCommandLimit(float speedFactor, float& commandX, float& commandY);
 

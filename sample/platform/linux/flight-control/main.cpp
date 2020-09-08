@@ -67,6 +67,10 @@ int main(int argc, char** argv) {
   std::cout << "| [c] Monitored Takeoff + Position Control + Force Landing "
                "Avoid Ground  |"
             << std::endl;
+  std::cout << "| [d] Test broadcast and subscribe height |" << std::endl;
+  std::cout << "| [e] Test broadcast height|" << std::endl;
+  std::cout << "| [f] Test broadcast altitude|" << std::endl;
+  std::cout << "| [g] Test Subscribe altitude|" << std::endl;
 
   char inputChar;
   std::cin >> inputChar;
@@ -119,6 +123,35 @@ int main(int argc, char** argv) {
       vehicle->flightController->setCollisionAvoidanceEnabledSync(
         FlightController::AvoidEnable::AVOID_ENABLE, 1);
       break;
+
+    case 'd':
+    {
+      flightSample->monitoredTakeoff();
+      flightSample->moveByPositionOffset((FlightSample::Vector3f){0, 0, 20}, 0);
+      monitoredLanding(vehicle);
+    }
+
+    case 'e':
+    {
+      flightSample->monitoredTakeoff();
+      flightSample->moveByPositionOffsetUsingBroadcastHeight((FlightSample::Vector3f){0, 0, 20}, 0);
+      monitoredLanding(vehicle);
+    }
+
+    case 'f':
+    {
+      flightSample->monitoredTakeoff();
+      flightSample->moveByPositionOffsetUsingBroadcastAltitute((FlightSample::Vector3f){0, 0, 20}, 0);
+      monitoredLanding(vehicle);
+    }
+
+    case 'g':
+    {
+      flightSample->monitoredTakeoff();
+      flightSample->moveByPositionOffsetUsingSubscribeHeight((FlightSample::Vector3f){0, 0, 20}, 0);
+      monitoredLanding(vehicle);
+    }
+
     default:
       break;
   }
