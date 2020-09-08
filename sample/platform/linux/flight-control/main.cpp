@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
           FlightController::AvoidEnable::AVOID_ENABLE, 1);
 
       /*! Move to higher altitude */
-      flightSample->moveByPositionOffset((FlightSample::Vector3f){0, 0, 30}, 0);
+      flightSample->moveByPositionOffset((FlightSample::Vector3f){0, 0, 10}, 0);
 
       /*! Move a short distance*/
       flightSample->moveByPositionOffset((FlightSample::Vector3f){10, 0, 0}, 0);

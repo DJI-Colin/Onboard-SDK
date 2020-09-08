@@ -69,9 +69,11 @@ typedef enum
   TOPIC_ALTITUDE_BAROMETER,
   TOPIC_ALTITUDE_OF_HOMEPOINT,
   TOPIC_HEIGHT_FUSION,
+  //GPS融合數據，Z軸是超聲高
   TOPIC_GPS_FUSED,
   TOPIC_GPS_DATE,
   TOPIC_GPS_TIME,
+  //GPS原始數據，高度不準
   TOPIC_GPS_POSITION,
   TOPIC_GPS_VELOCITY,
   TOPIC_GPS_DETAILS,
@@ -274,6 +276,7 @@ typedef struct GlobalPosition
   float64_t latitude;  /*!< unit: rad */
   float64_t longitude; /*!< unit: rad */
   float32_t altitude;  /*!< Measured by barometer: WGS 84 reference ellipsoid */
+  //TO do:height只有在10m下有效
   float32_t height;    /*!< Ultrasonic height in meters */
   uint8_t   health;    /*!< scale from 0 - 5 signifying gps signal strength <br>
                         * greater than 3 for strong signal */
@@ -821,6 +824,7 @@ template <> struct TypeMap<TOPIC_ALTITUDE_FUSIONED        > { typedef float32_t 
 template <> struct TypeMap<TOPIC_ALTITUDE_BAROMETER       > { typedef float32_t       type;};
 template <> struct TypeMap<TOPIC_ALTITUDE_OF_HOMEPOINT    > { typedef float32_t       type;};
 template <> struct TypeMap<TOPIC_HEIGHT_FUSION            > { typedef float32_t       type;};
+//超声高
 template <> struct TypeMap<TOPIC_GPS_FUSED                > { typedef GPSFused        type;};
 template <> struct TypeMap<TOPIC_GPS_DATE                 > { typedef uint32_t        type;};
 template <> struct TypeMap<TOPIC_GPS_TIME                 > { typedef uint32_t        type;};

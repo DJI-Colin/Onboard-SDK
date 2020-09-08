@@ -101,19 +101,30 @@ bool FlightSample::moveByPositionOffset(const Vector3f& offsetDesired,
   int speedFactor = 2;
 
   int pkgIndex = 0;
-  TopicName topicList[] = {TOPIC_QUATERNION, TOPIC_GPS_FUSED,
-                           TOPIC_HEIGHT_FUSION};
+  int pkgIndex1 = 1;
+  TopicName topicList[] = {TOPIC_QUATERNION, TOPIC_GPS_FUSED,TOPIC_HEIGHT_FUSION
+                           };
   int numTopic = sizeof(topicList) / sizeof(topicList[0]);
   if (!setUpSubscription(pkgIndex, controlFreqInHz, topicList, numTopic,
                          responseTimeout)) {
     return false;
   }
+
+  TopicName topicList1[] = {TOPIC_ALTITUDE_OF_HOMEPOINT
+                           };
+  if (!setUpSubscription(pkgIndex1, 1, topicList1, 1,
+                         responseTimeout)) {
+    return false;
+  }
+
   sleep(1);
   //! get origin position and relative height(from home point)of aircraft.
   Telemetry::TypeMap<TOPIC_GPS_FUSED>::type originGPSPosition =
       vehicle->subscribe->getValue<TOPIC_GPS_FUSED>();
   /*! TODO: TOPIC_HEIGHT_FUSION is abnormal in real world but normal in simulator */
   Telemetry::GlobalPosition currentBroadcastGP = vehicle->broadcast->getGlobalPosition();
+  Telemetry::TypeMap<TOPIC_ALTITUDE_OF_HOMEPOINT>::type homepointPosition =
+      vehicle->subscribe->getValue<TOPIC_ALTITUDE_OF_HOMEPOINT>();
   float32_t originHeightBaseHomepoint = currentBroadcastGP.height;
   FlightController::JoystickMode joystickMode = {
     FlightController::HorizontalLogic::HORIZONTAL_POSITION,
@@ -139,6 +150,7 @@ bool FlightSample::moveByPositionOffset(const Vector3f& offsetDesired,
     Vector3f positionCommand = offsetRemaining;
     horizCommandLimit(speedFactor, positionCommand.x, positionCommand.y);
 
+    DSTATUS("originHeightBaseHomepoint: %f, homepointPosition: %f\n", originHeightBaseHomepoint, homepointPosition);
     FlightController::JoystickCommand joystickCommand = {
         positionCommand.x, positionCommand.y,
         offsetDesired.z + originHeightBaseHomepoint, yawDesiredInDeg};
@@ -147,6 +159,7 @@ bool FlightSample::moveByPositionOffset(const Vector3f& offsetDesired,
 
     vehicle->flightController->joystickAction();
 
+    DSTATUS("offsetRemaining.z:%f", offsetRemaining.z);
     if (vectorNorm(offsetRemaining) < posThresholdInM &&
         std::fabs(yawInRad / DEG2RAD - yawDesiredInDeg) < yawThresholdInDeg) {
       //! 1. We are within bounds; start incrementing our in-bound counter
@@ -180,9 +193,11 @@ bool FlightSample::moveByPositionOffset(const Vector3f& offsetDesired,
   if (elapsedTimeInMs >= timeoutInMilSec) {
     std::cout << "Task timeout!\n";
     teardownSubscription(pkgIndex);
+    teardownSubscription(pkgIndex1);
     return false;
   }
   teardownSubscription(pkgIndex);
+  teardownSubscription(pkgIndex1);
   return true;
 }
 
