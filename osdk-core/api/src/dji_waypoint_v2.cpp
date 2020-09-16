@@ -33,6 +33,9 @@
 #include "memory.h"
 #include "dji_internal_command.hpp"
 #include <math.h>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 using namespace DJI;
 using namespace DJI::OSDK;
 
@@ -86,6 +89,8 @@ bool missionEncode(const std::vector<WaypointV2Internal> &mission, uint8_t *push
   static uint16_t startIndex = 0;
   uint16_t endIndex = 0;
   uint8_t *tempPtr = pushPtr;
+  string txtName = "waypointPosition_X_Y.txt";
+  ofstream fout(txtName);
 
   /*! {{startIndex, endIndex, waypoint1, waypoint2,...},{startIndex, endIndex,
    * waypoint1, waypoint2,...}, ....*/
@@ -96,6 +101,9 @@ bool missionEncode(const std::vector<WaypointV2Internal> &mission, uint8_t *push
   uint16_t i = 0;
   for (i = startIndex; (tempTotalLen < 200) && i < mission.size(); ++i) {
     WaypointV2Internal wp = mission[i];
+    fout.setf(ios::fixed);
+
+    fout<< "wp.positionX: " << fixed << setprecision(8) << wp.positionX << " , wp.positionY: " << fixed << setprecision(8)<< wp.positionY <<endl;
     elementEncode<float32_t>(wp.positionX, tempTotalLen, tempPtr);
     elementEncode<float32_t>(wp.positionY, tempTotalLen, tempPtr);
     elementEncode<float32_t>(wp.positionZ, tempTotalLen, tempPtr);
@@ -213,9 +221,13 @@ std::vector<WaypointV2> transformMisssionInternal2Mission(std::vector<WaypointV2
 std::vector<WaypointV2Internal> transformMission2MisssionInternal(std::vector<WaypointV2> &mission)
 {
   std::vector<WaypointV2Internal> missionInternal;
+  string txtName = "waypointV2_la_long.txt";
+  ofstream fout(txtName);
   for (auto waypointV2:mission)
   {
     WaypointV2Internal waypointV2Internal;
+    fout.setf(ios::fixed);
+    fout<<"waypointV2.latitude: " << fixed << setprecision(8) << waypointV2.latitude << " ,waypointV2.longitude: " <<fixed << setprecision(8) <<waypointV2.longitude <<endl;
     waypointV2Internal.positionX = (waypointV2.latitude - mission[0].latitude) * EARTH_RADIUS;
     waypointV2Internal.positionY = (waypointV2.longitude - mission[0].longitude) * EARTH_RADIUS *cos(mission[0].latitude);
     waypointV2Internal.positionZ = waypointV2.relativeHeight;
@@ -230,6 +242,7 @@ std::vector<WaypointV2Internal> transformMission2MisssionInternal(std::vector<Wa
     waypointV2Internal.autoFlightSpeed = uint16_t (waypointV2.autoFlightSpeed *100);
     missionInternal.push_back(waypointV2Internal);
   }
+  fout.close();
   return missionInternal;
 
 }
